@@ -19,7 +19,8 @@ import csv
 class DSCLab4:
     def __init__(self, csvFile, ws):  # This is the constructor for our class.
         self.csvFile = csvFile  # This is the name of the csv file we will be writing to.
-        self.ws = ws  # This is the worksheet we will be working with.
+        self.ws = ws # This is the worksheet we will be working with.
+        self.row_number = 0 #this will count the number of rows in our csv file
 
     # This function "get_categories", given the worksheet "Table 9" as a parameter, returns a list of categories of
     # child abuse
@@ -99,6 +100,7 @@ class DSCLab4:
                 for j in range(len(categories)):
                     if values[i][j] != chr(8211) and values[i][j] != 0 and values[i][j] != chr(8211) + ' ':
                         csvwriter.writerow([countries[i], categories[j], values[i][j]])
+                        self.row_number += 1 # increment the variable counting rows in the output csv file
 
 
 def main():
@@ -115,9 +117,10 @@ def main():
     countries = lab4.get_countries()
     values = lab4.get_values()
     categories = lab4.get_categories()
-
     # write the data into a csv file
     lab4.write_csv(countries, categories, values)
+
+    print(f"Number of rows in the output CSV file is: {lab4.row_number}") # get the number of rows in the csv file.
 
 
 main()  # call the main function
