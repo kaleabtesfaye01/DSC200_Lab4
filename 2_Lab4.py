@@ -9,107 +9,115 @@ respective countries and creates a CSV file containing the country name, categor
 Due Date: Oct 4, 2023
 """
 
-# We are importing the libraries we need. We use openpyxl to work with our xlsx file and csv to work with our output.
+# We import the openpyxl module to read the Excel file and the csv module to write the output to a csv file.
 import openpyxl as op
 import csv
 
 
-#We create a class called DSCLab4 that has the functions to extract and return the needed lists from the excel file.
+# This is our class DSCLab4. It has 3 functions: get_categories, get_values and get_countries. It also has a
+# constructor that takes in the csv file name and the worksheet as parameters.
 class DSCLab4:
-    def __init__(self,csvFile): # This is the constructor for our class.
-        self.csvFile = csvFile
-    """
-    This function gets the categories names from the excel file and returns it as a list. It iterates through the rows
-    and for each merged cell, it assigns the value of start_cell of the merged cells range. Then it adds that value to
-    the row list. For row 6, if the value is in the first row it sets it to an empty string. Then we append all the 3 
-    rows together and form one list. To remove duplicates, we change it to a set then back to a list. 
-    
-    """
-    def get_categories(self, ws):
-        category_names = []
-        for cols in ws.iter_rows(min_row=5, max_row=7, min_col=5, max_col=31):
-            row = []
-            for cell in cols:
-                currVal = cell.value
-                for merged_cells in ws.merged_cells.ranges:
-                    if cell.coordinate in merged_cells:
-                        currVal = merged_cells.start_cell.value
+    def __init__(self, csvFile, ws):  # This is the constructor for our class.
+        self.csvFile = csvFile  # This is the name of the csv file we will be writing to.
+        self.ws = ws  # This is the worksheet we will be working with.
+
+    # This function "get_categories", given the worksheet "Table 9" as a parameter, returns a list of categories of
+    # child abuse
+    def get_categories(self):
+        category_names = []  # initialize our category_names list to an empty list
+
+        # iterate through the rows and columns to extract the category names
+        for cols in self.ws.iter_rows(min_row=5, max_row=7, min_col=5, max_col=31):
+            row = []  # holds the list of category names for one row
+            for cell in cols:  # iterate through the cells in each row
+                currVal = cell.value  # holds the current value of the cell
+
+                # iterate through the merged cells to check if the cell is in a merged cell
+                for merged_cells in self.ws.merged_cells.ranges:
+                    if cell.coordinate in merged_cells:  # if the cell is in a merged cell
+                        currVal = merged_cells.start_cell.value  # set the current value to the value of the merged cell
+
+                # if the cell is in row 6 and the value is in the first column, we set the current value to an empty
+                # string
                 if cell.row == 6 and currVal in category_names[0]:
                     currVal = ''
                 row.append(currVal)
             category_names.append(row)
 
         categories = []
-        for i in range(len(category_names[0])):
+        for i in range(len(category_names[0])):  # iterate through the columns
             category = ''
-            for j in range(len(category_names)):
+            for j in range(len(category_names)):  # iterate through the rows
+
+                # if the value is not None, we replace the newline character with an empty string
                 category_names[j][i] = category_names[j][i].replace('\n', '')
+
+                # we add the value to our category string
                 category = category + '_' + category_names[j][i] if category != '' else category_names[j][i]
             categories.append(category)
 
-        return list(dict.fromkeys(categories))
+        return list(dict.fromkeys(categories))  # return the list of categories without duplicates
 
-
-    # This function "get_values", given the worksheet "Table 9" as a parameter, returns a list of lists containing all the
-    # values for each category of child abuse for each country
-    def get_values(self, ws):
+    # This function "get_values", given the worksheet "Table 9" as a parameter, returns a list of values for each
+    # country
+    def get_values(self):
         values = list()  # initialize our values list to an empty list
 
-        for row in ws['E15:AF211']:  # iterate through cells E15:AF211 to extract all the relevant values
+        for row in self.ws['E15:AF211']:  # iterate through cells E15:AF211 to extract all the relevant values
             value = []  # holds the list of values for one country
             for cell in row:  # iterate through cells in each row
                 # if the value is an integer or a floating point number or an en dash, we add it to our list of values
-                if type(cell.value) == int or type(cell.value) == float or cell.value == chr(8211) or cell.value == chr(8211) + ' ':
+                if type(cell.value) == int or type(cell.value) == float or cell.value == chr(8211) or cell.value == chr(
+                        8211) + ' ':
                     value.append(cell.value)
             values.append(value)  # append the values in one row into the values list
 
         return values
 
-    # This function "get_countries", given the worksheet "Table 9" as a parameter, returns the list of countries in the
-    # worksheet
-    def get_countries(self, ws):
+    # This function "get_countries", given the worksheet "Table 9" as a parameter, returns a list of countries
+    def get_countries(self):
         countries = list()  # initialize our countries list to an empty list
 
-        for row in ws['B15:B211']:  # iterate through cells B15:B211 to extract the country names
+        for row in self.ws['B15:B211']:  # iterate through cells B15:B211 to extract the country names
             for cell in row:  # iterate though the cells in each row
                 countries.append(cell.value)  # add the value of each cell into our countries list
         return countries
 
+    # This function "write_csv", given the list of countries, categories and values as parameters, writes the data into
+    # a csv file
+    def write_csv(self, countries, categories, values):
+        csv_file = self.csvFile  # name of the csv file we will be writing to
 
-    #This function writes the output in a csv file. It iterates through the countires and for each country it iterates
-    # using zip function to go thorugh both lists simultaneously.
-    def write_csv(self,countries, categories, values):
-        csv_file = self.csvFile
-        heading = ['CountryName', 'CategoryName', 'CategoryTotal']
+        # open the csv file
+        with open(csv_file, 'w') as csvfile:
+            csvwriter = csv.writer(csvfile)  # create a csv writer object
+            heading = ['CountryName', 'CategoryName', 'CategoryTotal']  # create a list of headings
+            csvwriter.writerow(heading)  # write the heading into the csv file
 
-        with open(csv_file, 'w', newline ='') as csvfile:
-            csvwriter = csv.writer(csvfile)
-            csvwriter.writerow(heading)
-
-            # iterate through the list to get the rows
-            for country in countries:
-                for category, value_list in zip(categories, values):
-                    for value in value_list:
-                        csvwriter.writerow([country, category, value])
+            # iterate through the countries, categories and values and write them into the csv file
+            for i in range(len(countries)):
+                for j in range(len(categories)):
+                    if values[i][j] != chr(8211) and values[i][j] != 0 and values[i][j] != chr(8211) + ' ':
+                        csvwriter.writerow([countries[i], categories[j], values[i][j]])
 
 
 def main():
     # load our workbook
-    wb = op.load_workbook('./data/Lab4Data.xlsx')
+    wb = op.load_workbook('data/Lab4Data.xlsx')
 
     # open the active worksheet, "Table 9"
-    ws = wb.active
-    #we create a csv file
-    lab4 = DSCLab4('aryalm1_alemuk1_lab4.csv')
-    # call the get_countries, get_values and get_categories functions and enter the results as parameters for our
-    # write_csv function
-    # write_csv(get_countries(ws), get_values(ws), get_categories(ws))
-    countries = lab4.get_countries(ws)
-    values = lab4.get_values(ws)
-    categories = lab4.get_categories(ws)
+    ws = wb['Table 9 ']
 
-    # we instantiate a type of class and passing the 3 categories.
+    # create an instance of our class DSCLab4
+    lab4 = DSCLab4('aryalm1_alemuk1_lab4.csv', ws)
+
+    # get the countries, categories and values using the functions in our class
+    countries = lab4.get_countries()
+    values = lab4.get_values()
+    categories = lab4.get_categories()
+
+    # write the data into a csv file
     lab4.write_csv(countries, categories, values)
 
 
-main()  # run our script
+main()  # call the main function
