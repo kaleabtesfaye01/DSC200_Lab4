@@ -49,10 +49,10 @@ def write_csv(countries, categories, values):
 
 def main():
     # load our workbook
-    wb = op.load_workbook('./data/Lab4Data.xlsx', read_only=True, data_only=True)
+    wb = op.load_workbook('./data/Lab4Data.xlsx')
 
     # open the active worksheet, "Table 9"
-    ws = wb.active
+    ws = wb['Table 9 ']
 
     # call the get_countries, get_values and get_categories functions and enter the results as parameters for our
     # write_csv function
