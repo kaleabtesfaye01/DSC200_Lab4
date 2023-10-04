@@ -4,20 +4,28 @@ DSC 200
 Lab 4: Working with Excel Files
 
 This program reads data from "Lab4Data.xlsx" which contains data collected from countries regarding child abuse in those
-respective countries and creates a CSV file containing the country name, category of child abuse and category total
+respective countries and creates a CSV file containing the country name, category of child abuse and category total.
 
 Due Date: Oct 4, 2023
 """
 
+# We are importing the libraries we need. We use openpyxl to work with our xlsx file and csv to work with our output.
 import openpyxl as op
 import csv
 
 
-class DSCLab5:
-    def __init__(self,csvFile):
+#We create a class called DSCLab4 that has the functions to extract and return the needed lists from the excel file.
+class DSCLab4:
+    def __init__(self,csvFile): # This is the constructor for our class.
         self.csvFile = csvFile
-
-    def get_categories(ws):
+    """
+    This function gets the categories names from the excel file and returns it as a list. It iterates through the rows
+    and for each merged cell, it assigns the value of start_cell of the merged cells range. Then it adds that value to
+    the row list. For row 6, if the value is in the first row it sets it to an empty string. Then we append all the 3 
+    rows together and form one list. To remove duplicates, we change it to a set then back to a list. 
+    
+    """
+    def get_categories(self, ws):
         category_names = []
         for cols in ws.iter_rows(min_row=5, max_row=7, min_col=5, max_col=31):
             row = []
@@ -44,7 +52,7 @@ class DSCLab5:
 
     # This function "get_values", given the worksheet "Table 9" as a parameter, returns a list of lists containing all the
     # values for each category of child abuse for each country
-    def get_values(ws):
+    def get_values(self, ws):
         values = list()  # initialize our values list to an empty list
 
         for row in ws['E15:AF211']:  # iterate through cells E15:AF211 to extract all the relevant values
@@ -59,7 +67,7 @@ class DSCLab5:
 
     # This function "get_countries", given the worksheet "Table 9" as a parameter, returns the list of countries in the
     # worksheet
-    def get_countries(ws):
+    def get_countries(self, ws):
         countries = list()  # initialize our countries list to an empty list
 
         for row in ws['B15:B211']:  # iterate through cells B15:B211 to extract the country names
@@ -68,6 +76,8 @@ class DSCLab5:
         return countries
 
 
+    #This function writes the output in a csv file. It iterates through the countires and for each country it iterates
+    # using zip function to go thorugh both lists simultaneously.
     def write_csv(self,countries, categories, values):
         csv_file = self.csvFile
         heading = ['CountryName', 'CategoryName', 'CategoryTotal']
@@ -89,14 +99,16 @@ def main():
 
     # open the active worksheet, "Table 9"
     ws = wb.active
-    lab5 = DSCLab5('aryalm1_alemuk1_lab4.csv')
+    #we create a csv file
+    lab4 = DSCLab4('aryalm1_alemuk1_lab4.csv')
     # call the get_countries, get_values and get_categories functions and enter the results as parameters for our
     # write_csv function
     # write_csv(get_countries(ws), get_values(ws), get_categories(ws))
-    countries = lab5.get_countries(ws)
-    values = lab5.get_values(ws)
-    categories = lab5.get_categories(ws)
+    countries = lab4.get_countries(ws)
+    values = lab4.get_values(ws)
+    categories = lab4.get_categories(ws)
 
-    lab5.write_csv(countries, categories, values)
+    # we instantiate a type of class and passing the 3 categories.
+    lab4.write_csv(countries, categories, values)
 
 main()  # run our script
