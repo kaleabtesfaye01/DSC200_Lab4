@@ -26,9 +26,10 @@ def get_values(ws):
         value = []  # holds the list of values for one country
         for cell in row:  # iterate through cells in each row
             # if the value is an integer or a floating point number or an en dash, we add it to our list of values
-            if type(cell.value) == int or type(cell.value) == float or cell.value == chr(0x2013):
+            if type(cell.value) == int or type(cell.value) == float or cell.value == chr(8211) or cell.value == chr(8211) + ' ':
                 value.append(cell.value)
         values.append(value)  # append the values in one row into the values list
+
     return values
 
 
@@ -43,7 +44,7 @@ def get_countries(ws):
     return countries
 
 
-def write_csv(countries, categories, values):
+def write_csv(countries, values, categories):
     pass
 
 
@@ -56,7 +57,7 @@ def main():
 
     # call the get_countries, get_values and get_categories functions and enter the results as parameters for our
     # write_csv function
-    write_csv(get_countries(ws), get_values(ws), get_categories(ws))
+    write_csv(countries=get_countries(ws), values=get_values(ws), categories=get_categories(ws))
 
 
 main()  # run our script
