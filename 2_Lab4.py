@@ -68,8 +68,19 @@ class DSCLab5:
         return countries
 
 
-    def write_csv(countries, categories, values):
-        pass
+    def write_csv(self,countries, categories, values):
+        csv_file = self.csvFile
+        heading = ['CountryName', 'CategoryName', 'CategoryTotal']
+
+        with open(csv_file, 'w', newline ='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(heading)
+
+            # iterate through the list to get the rows
+            for country in countries:
+                for category, value_list in zip(categories, values):
+                    for value in value_list:
+                        csvwriter.writerow([country, category, value])
 
 
 def main():
@@ -77,11 +88,15 @@ def main():
     wb = op.load_workbook('./data/Lab4Data.xlsx')
 
     # open the active worksheet, "Table 9"
-    ws = wb['Table 9 ']
-
+    ws = wb.active
+    lab5 = DSCLab5('aryalm1_alemuk1_lab4.csv')
     # call the get_countries, get_values and get_categories functions and enter the results as parameters for our
     # write_csv function
-    write_csv(get_countries(ws), get_values(ws), get_categories(ws))
+    # write_csv(get_countries(ws), get_values(ws), get_categories(ws))
+    countries = lab5.get_countries(ws)
+    values = lab5.get_values(ws)
+    categories = lab5.get_categories(ws)
 
+    lab5.write_csv(countries, categories, values)
 
 main()  # run our script
